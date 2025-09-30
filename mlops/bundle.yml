@@ -1,0 +1,21 @@
+resources:
+  jobs:
+    train-validate-deploy:
+      name: mlops-train-validate-deploy
+      tasks:
+        - task_key: train
+          notebook_task:
+            notebook_path: /Workspace/Users/rm360824@fiap.com.br/PosTechChallenge3/mlops/training/Train.ipynb
+          existing_cluster_id: 0916-002527-kqdo03h1
+
+        - task_key: validate
+          depends_on: [train]
+          notebook_task:
+            notebook_path: /Workspace/Users/rm360824@fiap.com.br/PosTechChallenge3/mlops/validation/Validation.ipynb
+          existing_cluster_id: 0916-002527-kqdo03h1
+
+        - task_key: batch_inference
+          depends_on: [validate]
+          notebook_task:
+            notebook_path: /Workspace/Users/rm360824@fiap.com.br/PosTechChallenge3/mlops/deployment/notebooks/BatchInference.ipynb
+          existing_cluster_id: 0916-002527-kqdo03h1
