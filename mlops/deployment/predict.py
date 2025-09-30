@@ -18,16 +18,16 @@ def predict_batch(model_uri, input_path, output_path, model_version):
     # Ler dataset
     df = pd.read_csv(input_path)
 
-    # Features
-    X = df.drop(columns=["MSRP", "city mpg", "highway MPG"], errors="ignore")
+    # Features (remove colunas alvo)
+    X = df.drop(columns=["msrp", "city_mpg", "highway_mpg"], errors="ignore")
 
     # Fazer previsões
     preds = model.predict(X)
 
-    # Montar DF final
+    # Montar DF final com previsões
     pred_df = pd.DataFrame(
         preds,
-        columns=["MSRP_pred", "city_mpg_pred", "highway_mpg_pred"]
+        columns=["msrp_pred", "city_mpg_pred", "highway_mpg_pred"]
     )
     final_df = pd.concat([df.reset_index(drop=True), pred_df], axis=1)
 
