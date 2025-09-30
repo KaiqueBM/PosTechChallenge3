@@ -35,6 +35,6 @@ def predict_batch(model_uri, input_path, output_path, model_version):
     final_df["model_id"] = model_version
     final_df["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # Salvar em CSV (ou Delta, se preferir)
+    # Salvar em CSV
     final_df.to_csv(output_path, index=False)
     print(f"Predições salvas em: {output_path}")
