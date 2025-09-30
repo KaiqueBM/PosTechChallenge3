@@ -1,0 +1,22 @@
+{
+  "name": "mlops-train-batch",
+  "tasks": [
+    {
+      "task_key": "train",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/rm360824@fiap.com.br/PosTechChallenge3/mlops/training/Train.ipynb"
+      },
+      "existing_cluster_id": "0916-002527-kqdo03h1"
+    },
+    {
+      "task_key": "batch_inference",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/rm360824@fiap.com.br/PosTechChallenge3/mlops/deployment/notebooks/BatchInference.ipynb"
+      },
+      "depends_on": [
+        {"task_key": "train"}
+      ],
+      "existing_cluster_id": "0916-002527-kqdo03h1"
+    }
+  ]
+}
