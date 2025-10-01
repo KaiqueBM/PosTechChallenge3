@@ -7,7 +7,7 @@
         "notebook_path": "mlops/training/notebooks/Train",
         "source": "GIT"
       },
-      "existing_cluster_id": "0916-002527-kqdo03h1"
+      "existing_cluster_id": "1001-174228-o1dy5vy8"
     }
   ],
   "git_source": {
