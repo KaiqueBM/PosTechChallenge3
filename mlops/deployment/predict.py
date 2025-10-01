@@ -39,4 +39,4 @@ def predict_batch(spark, model_uri, source_table, output_table, model_version):
     # Salvar Resultados Na Tabela
     spark_df = spark.createDataFrame(final_df)
     spark.sql("create database if not exists postech_ml")
-    spark_df.write.mode("overwrite").saveAsTable(output_table)
+    spark_df.write.mode("append").saveAsTable(output_table)
