@@ -5,6 +5,10 @@ on:
     branches:
       - dev
       - master
+    paths:
+      - 'mlops/jobs/**'
+      - '.github/workflows/deploy_job.yml'
+
 
 jobs:
   deploy_job:
@@ -47,4 +51,3 @@ jobs:
         run: |
           CLUSTER_ID="${{ secrets.EXISTING_CLUSTER_ID }}"
           sed "s|{{CLUSTER_ID}}|$CLUSTER_ID|g" mlops/jobs/job_config.json.template > mlops/jobs/predict_job_config.json
-          
