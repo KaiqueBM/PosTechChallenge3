@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
+
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -36,5 +37,9 @@ jobs:
 
       - name: Create or update Databricks job
         run: |
-          databricks jobs create --json @mlops/jobs/predict_job_config.json || \
-          (echo "Job already exists, updating..." && databricks jobs reset --json @mlops/jobs/predict_job_config.json)
+          if databricks jobs create --json @mlops/jobs/predict_job_config.json 2>/dev/null; then
+            echo "Job created successfully."
+          else
+            echo "Job already exists, resetting..."
+            databricks jobs reset --json @mlops/jobs/predict_job_config.json
+          fi
