@@ -26,6 +26,9 @@ jobs:
           echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
           echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
 
+      - name: List files in mlops/jobs
+        run: ls -la mlops/jobs
+
       - name: Substitute cluster_id in JSON
         run: |
           CLUSTER_ID="${{ secrets.EXISTING_CLUSTER_ID }}"
