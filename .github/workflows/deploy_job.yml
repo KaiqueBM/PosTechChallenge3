@@ -1,0 +1,38 @@
+name: Deploy Databricks Job
+
+on:
+  push:
+    branches:
+      - dev
+      - master
+
+jobs:
+  deploy_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Databricks CLI
+        run: pip install --upgrade databricks-cli
+
+      - name: Configure Databricks CLI
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: databricks configure --token <<< "$DATABRICKS_HOST\n$DATABRICKS_TOKEN"
+
+      - name: Substitute cluster_id in JSON
+        run: |
+          CLUSTER_ID="${{ secrets.EXISTING_CLUSTER_ID }}"
+          sed "s|{{CLUSTER_ID}}|$CLUSTER_ID|g" mlops/jobs/predict_job_config.json.template > mlops/predict_job_config.json
+
+      - name: Create or update Databricks job
+        run: |
+          databricks jobs create --json @mlops/predict_job_config.json || \
+          echo "Job already exists, updating..." && databricks jobs reset --json @mlops/predict_job_config.json
