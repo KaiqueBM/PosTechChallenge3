@@ -29,7 +29,7 @@ jobs:
       - name: Substitute cluster_id in JSON
         run: |
           CLUSTER_ID="${{ secrets.EXISTING_CLUSTER_ID }}"
-          sed "s|{{CLUSTER_ID}}|$CLUSTER_ID|g" mlops/jobs/predict_job_config.json.template > mlops/predict_job_config.json
+          sed "s|{{CLUSTER_ID}}|$CLUSTER_ID|g" mlops/jobs/job_config.json.template > mlops/predict_job_config.json
 
       - name: Create or update Databricks job
         run: |
