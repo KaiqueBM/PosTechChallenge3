@@ -31,12 +31,13 @@ jobs:
         run: cat mlops/jobs/predict_job_config.json
 
       - name: Create or update Databricks job
+        working-directory: mlops/jobs
         run: |
-          if databricks jobs create --json @mlops/jobs/predict_job_config.json 2>/dev/null; then
+          if databricks jobs create --json @predict_job_config.json 2>/dev/null; then
             echo "Job created successfully."
           else
             echo "Job already exists, resetting..."
-            databricks jobs reset --json @mlops/jobs/predict_job_config.json
+            databricks jobs reset --json @predict_job_config.json
           fi
 
       - name: Check JSON content
