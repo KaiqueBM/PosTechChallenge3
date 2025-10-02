@@ -21,11 +21,10 @@ jobs:
       - name: Install Databricks CLI
         run: pip install --upgrade databricks-cli
 
-      - name: Configure Databricks CLI
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: databricks configure --token <<< "$DATABRICKS_HOST\n$DATABRICKS_TOKEN"
+      - name: Set Databricks environment
+        run: |
+          echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
+          echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
 
       - name: Substitute cluster_id in JSON
         run: |
