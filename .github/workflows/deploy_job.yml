@@ -22,6 +22,9 @@ jobs:
       - name: Install Databricks CLI
         run: pip install --upgrade databricks-cli
 
+      - name: Configure Databricks Jobs API
+        run: databricks jobs configure --version=2.1
+
       - name: Set Databricks environment
         run: |
           echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
@@ -33,13 +36,10 @@ jobs:
       - name: Create or update Databricks job
         working-directory: mlops/jobs
         run: |
-          if databricks jobs create --json @predict_job_config.json 2>/dev/null; then
+          if databricks jobs create --json "$(cat predict_job_config.json)"; then
             echo "Job created successfully."
           else
             echo "Job already exists, resetting..."
-            databricks jobs reset --json @predict_job_config.json
+            databricks jobs reset --json "$(cat predict_job_config.json)"
           fi
-
-      - name: Check JSON content
-        run: cat mlops/jobs/predict_job_config.json
         
