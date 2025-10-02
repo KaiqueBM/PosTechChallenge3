@@ -22,13 +22,13 @@ jobs:
       - name: Install Databricks CLI
         run: pip install --upgrade databricks-cli
 
-      - name: Configure Databricks Jobs API
-        run: databricks jobs configure --version=2.1
-
       - name: Set Databricks environment
         run: |
           echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
           echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Configure Databricks Jobs API
+        run: databricks jobs configure --version=2.1
 
       - name: Check JSON content
         run: cat mlops/jobs/predict_job_config.json
