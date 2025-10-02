@@ -42,4 +42,9 @@ jobs:
             echo "Job already exists, resetting..."
             databricks jobs reset --json "$(cat predict_job_config.json)"
           fi
-        
+      
+      - name: Substitute cluster_id in JSON
+        run: |
+          CLUSTER_ID="${{ secrets.EXISTING_CLUSTER_ID }}"
+          sed "s|{{CLUSTER_ID}}|$CLUSTER_ID|g" mlops/jobs/job_config.json.template > mlops/jobs/predict_job_config.json
+          
