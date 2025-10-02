@@ -2,7 +2,7 @@
   "name": "model-inference",
   "tasks": [
     {
-      "task_key": "get_predict",
+      "task_key": "get_predictions",
       "notebook_task": {
         "notebook_path": "mlops/deployment/notebooks/BatchInference",
         "source": "GIT"
