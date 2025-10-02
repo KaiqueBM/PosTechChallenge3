@@ -31,6 +31,9 @@ jobs:
           CLUSTER_ID="${{ secrets.EXISTING_CLUSTER_ID }}"
           sed "s|{{CLUSTER_ID}}|$CLUSTER_ID|g" mlops/jobs/job_config.json.template > mlops/predict_job_config.json
 
+      - name: Checking the content of the generated JSON file
+        run: cat mlops/jobs/predict_job_config.json
+
       - name: Create or update Databricks job
         run: |
           databricks jobs create --json @mlops/predict_job_config.json || \
