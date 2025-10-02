@@ -27,19 +27,23 @@ jobs:
           echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
           echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
 
-      - name: Substitute cluster_id in JSON (real value)
+      - name: Check JSON content
+        run: cat mlops/jobs/predict_job_config.json
+
+      - name: Create or update Databricks job
+        run: |
+          if databricks jobs create --json @mlops/jobs/predict_job_config.json 2>/dev/null; then
+            echo "Job created successfully."
+          else
+            echo "Job already exists, resetting..."
+            databricks jobs reset --json @mlops/jobs/predict_job_config.json
+          fi
+
+      - name: Substitute cluster_id in JSON
         run: |
           CLUSTER_ID="${{ secrets.EXISTING_CLUSTER_ID }}"
           sed "s|{{CLUSTER_ID}}|$CLUSTER_ID|g" mlops/jobs/job_config.json.template > mlops/jobs/predict_job_config.json
 
-      - name: Create or update Databricks job
-        run: |
-          databricks jobs create --json @mlops/jobs/predict_job_config.json 2>/dev/null || \
-          databricks jobs reset --json @mlops/jobs/predict_job_config.json
-
-      - name: Mask cluster_id in JSON (replace with ***)
-        run: |
-          sed -i 's|'"${{ secrets.EXISTING_CLUSTER_ID }}"'|***|g' mlops/jobs/predict_job_config.json
-
-      - name: Check final JSON content
+      - name: Check JSON content
         run: cat mlops/jobs/predict_job_config.json
+        
