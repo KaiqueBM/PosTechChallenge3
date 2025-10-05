@@ -1,0 +1,48 @@
+name: Deploy Databricks Job
+
+on:
+  push:
+    branches:
+      - dev
+      - master
+    paths:
+      - 'mlops/jobs/**'
+      - '.github/workflows/deploy_job.yml'
+
+
+jobs:
+  deploy_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Databricks CLI
+        run: pip install --upgrade databricks-cli
+
+      - name: Set Databricks environment
+        run: |
+          echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
+          echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Configure Databricks Jobs API
+        run: databricks jobs configure --version=2.1
+
+      - name: Check JSON content
+        run: cat mlops/jobs/predict_job_config.json
+
+      - name: Create or update Databricks job
+        working-directory: mlops/jobs
+        run: |
+          if databricks jobs create --json "$(cat predict_job_config.json)"; then
+            echo "Job created successfully."
+          else
+            echo "Job already exists, resetting..."
+            databricks jobs reset --json "$(cat predict_job_config.json)"
+          fi
