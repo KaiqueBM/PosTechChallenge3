@@ -121,6 +121,10 @@ O projeto utiliza as seguintes tabelas para armazenar e processar os dados:
 
 Todas estão no schema "postech_ml" e no hive_metastore do Databricks.
 
+### Dashboard do Resultado no Power BI
+
+![Arquitetura](PowerBI.png)
+
 ## 💻 Execute o Projeto
 
 ### Clone o repositório
