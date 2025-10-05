@@ -4,7 +4,8 @@
 Este projeto foi desenvolvido para processar um dataset de características de carros e utilizá-lo para criar modelos de regressão de machine learning que preveem resultados do preço de um carro, consumo de combustível na estrada e na cidade com base em suas características. Ele inclui etapas de limpeza de dados, visualização, treinamento de modelos, validação e pipelines de implantação.
 
 ### 🧩 Arquitetura
-imagem aqui
+
+![Arquitetura](Arquitetura.png)
 
 ### 📂 Estrutura do Projeto
 
