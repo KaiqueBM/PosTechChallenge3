@@ -9,13 +9,15 @@ on:
       - 'mlops/jobs/**'
       - '.github/workflows/deploy_job.yml'
 
-
 jobs:
   deploy_job:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mlops/jobs
+
     steps:
       - name: Checkout repository
-
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -34,15 +36,21 @@ jobs:
       - name: Configure Databricks Jobs API
         run: databricks jobs configure --version=2.1
 
+      - name: Inject cluster ID
+        env:
+          EXISTING_CLUSTER_ID: ${{ secrets.EXISTING_CLUSTER_ID }}
+        run: |
+          envsubst < predict_job_config.json > tmp.json
+          mv tmp.json predict_job_config.json
+
       - name: Check JSON content
-        run: cat mlops/jobs/predict_job_config.json
+        run: cat predict_job_config.json
 
       - name: Create or update Databricks job
-        working-directory: mlops/jobs
         run: |
-          if databricks jobs create --json "$(cat predict_job_config.json)"; then
-            echo "Job created successfully."
+          if databricks jobs reset --json "$(cat predict_job_config.json)"; then
+            echo "Job reset successfully."
           else
-            echo "Job already exists, resetting..."
-            databricks jobs reset --json "$(cat predict_job_config.json)"
+            echo "Job does not exist, creating..."
+            databricks jobs create --json "$(cat predict_job_config.json)"
           fi

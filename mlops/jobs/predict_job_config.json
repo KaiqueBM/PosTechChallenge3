@@ -7,7 +7,7 @@
         "notebook_path": "mlops/deployment/notebooks/BatchInference",
         "source": "GIT"
       },
-      "existing_cluster_id": "1001-174228-o1dy5vy8"
+      "existing_cluster_id": "${EXISTING_CLUSTER_ID}"
     }
   ],
   "git_source": {
