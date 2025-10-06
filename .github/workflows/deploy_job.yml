@@ -48,9 +48,19 @@ jobs:
 
       - name: Create or update Databricks job
         run: |
-          if databricks jobs reset --json "$(cat predict_job_config.json)"; then
+          set -e
+
+          JOB_NAME=$(jq -r '.name' predict_job_config.json)
+          echo "Checking if job '$JOB_NAME' exists..."
+
+          JOB_ID=$(databricks jobs list --output JSON | jq -r ".jobs[] | select(.settings.name==\"$JOB_NAME\") | .job_id")
+
+          if [ -n "$JOB_ID" ] && [ "$JOB_ID" != "null" ]; then
+            echo "Job exists (ID: $JOB_ID). Resetting..."
+            databricks jobs reset --job-id "$JOB_ID" --json "$(cat predict_job_config.json)"
             echo "Job reset successfully."
           else
-            echo "Job does not exist, creating..."
+            echo "Job does not exist. Creating new one..."
             databricks jobs create --json "$(cat predict_job_config.json)"
+            echo "Job created successfully."
           fi
