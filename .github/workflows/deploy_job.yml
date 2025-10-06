@@ -52,9 +52,10 @@ jobs:
 
           cat train_job_config.json
 
-      - name: Create or update model-inference job
+      - name: Create or update jobs
         run: |
           create_or_update_job() {
+            set -e
             JOB_JSON=$1
             JOB_NAME=$(jq -r '.name' $JOB_JSON)
             JOB_ID=$(databricks jobs list --output JSON | jq -r ".jobs[] | select(.settings.name==\"$JOB_NAME\") | .job_id")
@@ -68,5 +69,5 @@ jobs:
             fi
           }
 
-          create_or_update_job mlops/jobs/predict_job_config.json
-          create_or_update_job mlops/jobs/train_job_config.json
+          create_or_update_job predict_job_config.json
+          create_or_update_job train_job_config.json
