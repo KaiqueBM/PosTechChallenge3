@@ -9,13 +9,15 @@ on:
       - 'mlops/jobs/**'
       - '.github/workflows/deploy_job.yml'
 
-
 jobs:
   deploy_job:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mlops/jobs
+
     steps:
       - name: Checkout repository
-
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -34,15 +36,38 @@ jobs:
       - name: Configure Databricks Jobs API
         run: databricks jobs configure --version=2.1
 
-      - name: Check JSON content
-        run: cat mlops/jobs/predict_job_config.json
-
-      - name: Create or update Databricks job
-        working-directory: mlops/jobs
+      - name: Inject cluster ID
+        env:
+          EXISTING_CLUSTER_ID: ${{ secrets.EXISTING_CLUSTER_ID }}
         run: |
-          if databricks jobs create --json "$(cat predict_job_config.json)"; then
-            echo "Job created successfully."
-          else
-            echo "Job already exists, resetting..."
-            databricks jobs reset --json "$(cat predict_job_config.json)"
-          fi
+          envsubst < predict_job_config.json > tmp.json
+          mv tmp.json predict_job_config.json
+
+          envsubst < train_job_config.json > tmp.json
+          mv tmp.json train_job_config.json
+
+      - name: Check JSON content
+        run: |
+          cat predict_job_config.json
+
+          cat train_job_config.json
+
+      - name: Create or update jobs
+        run: |
+          create_or_update_job() {
+            set -e
+            JOB_JSON=$1
+            JOB_NAME=$(jq -r '.name' $JOB_JSON)
+            JOB_ID=$(databricks jobs list --output JSON | jq -r ".jobs[] | select(.settings.name==\"$JOB_NAME\") | .job_id")
+
+            if [ -n "$JOB_ID" ] && [ "$JOB_ID" != "null" ]; then
+              databricks jobs reset --job-id "$JOB_ID" --json "$(cat $JOB_JSON)"
+              echo "Job reset successfully."
+            else
+              databricks jobs create --json "$(cat $JOB_JSON)"
+              echo "Job created successfully."
+            fi
+          }
+
+          create_or_update_job predict_job_config.json
+          create_or_update_job train_job_config.json
